@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Vendas - Loja</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            text-align: center;
+            font-size: 1.1em;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            font-size: 1.3em;
+            color: #555;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        .product {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .product:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .product.selected {
+            border-color: #667eea;
+            background: #e8e9ff;
+        }
+
+        .product-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9em;
+        }
+
+        .product-price {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+
+        .cart {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .cart-items {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: #f8f9fa;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            align-items: center;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .cart-item-price {
+            color: #e74c3c;
+            font-size: 0.9em;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .quantity-btn:disabled {
+            background: #ccc;
+        }
+
+        .quantity-display {
+            min-width: 30px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .remove-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cart-total {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2c3e50;
+            text-align: right;
+            margin-top: 15px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #229954;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .stock-info {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .stock-low {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏪 Loja Express</h1>
+            <p class="subtitle">Sistema de Vendas e Controle de Estoque</p>
+        </header>
+
+        <div class="dashboard">
+            <div class="card">
+                <h2 class="card-title">Produtos Disponíveis</h2>
+                <div class="products-grid" id="productsContainer">
+                    <!-- Produtos serão carregados aqui -->
+                </div>
+            </div>
+
+            <div class="cart">
+                <h2 class="card-title">🛒 Carrinho de Compras</h2>
+                <div class="cart-items" id="cartItems">
+                    <p style="text-align: center; color: #999;">Carrinho vazio</p>
+                </div>
+                <div class="cart-total" id="cartTotal">
+                    Total: R$ 0,00
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-outline" onclick="openAddProductModal()">
+                        ➕ Adicionar Produto
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearCart()">
+                        🗑️ Limpar Carrinho
+                    </button>
+                    <button class="btn btn-primary" onclick="finalizeSale()">
+                        ✅ Finalizar Venda
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Adicionar Produto -->
+    <div class="modal" id="addProductModal">
+        <div class="modal-content">
+            <h3 class="modal-title">Adicionar Novo Produto</h3>
+            <div class="form-group">
+                <label>Tipo de Produto</label>
+                <select id="productType" class="form-control" onchange="updateProductForm()">
+                    <option value="armarinho">Armarinho</option>
+                    <option value="bebida">Bebida (Garrafa)</option>
+                    <option value="dose">Dose de Bebida</option>
+                    <option value="carteira_cigarro">Carteira de Cigarro</option>
+                    <option value="unidade_cigarro">Unidade de Cigarro</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Nome do Produto</label>
+                <input type="text" id="productName" placeholder="Ex: Cerveja Skol 350ml">
+            </div>
+            <div class="form-group">
+                <label>Preço (R$)</label>
+                <input type="number" id="productPrice" step="0.01" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label>Quantidade em Estoque</label>
+                <input type="number" id="productStock" placeholder="0">
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="closeAddProductModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="addNewProduct()">Adicionar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Confirmação de Venda -->
+    <div class="modal" id="saleModal">
+        <div class="modal-content">
+            <h3 class="modal-title">✅ Venda Realizada!</h3>
+            <div class="success-message" id="saleMessage">
+                <!-- Mensagem será inserida aqui -->
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="closeSaleModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Banco de dados em memória
+        let estoque = {
+            '001': { id: '001', nome: 'Cerveja Skol 350ml', tipo: 'bebida', preco: 6.50, estoque: 50, icone: '🍺' },
+            '002': { id: '002', nome: 'Vodka Absolut 1L', tipo: 'bebida', preco: 89.90, estoque: 15, icone: '🍾' },
+            '003': { id: '003', nome: 'Dose de Whisky', tipo: 'dose', preco: 15.00, estoque: 30, icone: '🥃' },
+            '004': { id: '004', nome: 'Dose de Cachaça', tipo: 'dose', preco: 8.00, estoque: 40, icone: '🥃' },
+            '005': { id: '005', nome: 'Malboro Vermelho', tipo: 'carteira_cigarro', preco: 12.00, estoque: 25, icone: '🚬' },
+            '006': { id: '006', nome: 'Chesterfield Azul', tipo: 'carteira_cigarro', preco: 11.50, estoque: 20, icone: '🚬' },
+            '007': { id: '007', nome: 'Cigarro Avulso', tipo: 'unidade_cigarro', preco: 1.50, estoque: 100, icone: '🚬' },
+            '008': { id: '008', nome: 'Bala Halls 30g', tipo: 'armarinho', preco: 3.50, estoque: 60, icone: '🍬' },
+            '009': { id: '009', nome: 'Chiclete Trident', tipo: 'armarinho', preco: 2.00, estoque: 45, icone: '🍬' },
+            '010': { id: '010', nome: 'Salgadinho Doritos', tipo: 'armarinho', preco: 7.90, estoque: 35, icone: '🍟' }
+        };
+
+        let carrinho = [];
+        let proximoId = 11;
+
+        // Inicialização
+        window.onload = function() {
+            renderizarProdutos();
+            atualizarCarrinho();
+        };
+
+        // Renderizar produtos
+        function renderizarProdutos() {
+            const container = document.getElementById('productsContainer');
+            container.innerHTML = '';
+
+            Object.values(estoque).forEach(produto => {
+                const div = document.createElement('div');
+                div.className = 'product';
+                div.onclick = () => adicionarAoCarrinho(produto.id);
+                
+                // Destacar estoque baixo
+                const classeEstoque = produto.estoque < 10 ? 'stock-low' : '';
+                
+                div.innerHTML = `
+                    <div class="product-icon">${produto.icone}</div>
+                    <div class="product-name">${produto.nome}</div>
+                    <div class="product-price">R$ ${produto.preco.toFixed(2)}</div>
+                    <div class="stock-info ${classeEstoque}">
+                        Estoque: ${produto.estoque}
+                    </div>
+                `;
+                
+                container.appendChild(div);
+            });
+        }
+
+        // Adicionar ao carrinho
+        function adicionarAoCarrinho(produtoId) {
+            const produto = estoque[produtoId];
+            
+            if (produto.estoque <= 0) {
+                alert('Produto sem estoque disponível!');
+                return;
+            }
+
+            const itemExistente = carrinho.find(item => item.id === produtoId);
+            
+            if (itemExistente) {
+                if (itemExistente.quantidade < produto.estoque) {
+                    itemExistente.quantidade++;
+                } else {
+                    alert('Quantidade máxima atingida!');
+                }
+            } else {
+                carrinho.push({
+                    id: produtoId,
+                    nome: produto.nome,
+                    preco: produto.preco,
+                    quantidade: 1
+                });
+            }
+            
+            atualizarCarrinho();
+            renderizarProdutos();
+        }
+
+        // Atualizar carrinho
+        function atualizarCarrinho() {
+            const container = document.getElementById('cartItems');
+            const totalElement = document.getElementById('cartTotal');
+
+            if (carrinho.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999;">Carrinho vazio</p>';
+                totalElement.textContent = 'Total: R$ 0,00';
+                return;
+            }
+
+            let html = '';
+            let total = 0;
+
+            carrinho.forEach((item, index) => {
+                const subtotal = item.preco * item.quantidade;
+                total += subtotal;
+
+                html += `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${item.nome}</div>
+                            <div class="cart-item-price">R$ ${item.preco.toFixed(2)} x ${item.quantidade}</div>
+                        </div>
+                        <div class="quantity-controls">
+                            <button class="quantity-btn" onclick="diminuirQuantidade(${index})" ${item.quantidade <= 1 ? 'disabled' : ''}>-</button>
+                            <span class="quantity-display">${item.quantidade}</span>
+                            <button class="quantity-btn" onclick="aumentarQuantidade(${index})">+</button>
+                        </div>
+                        <button class="remove-btn" onclick="removerDoCarrinho(${index})">✕</button>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            totalElement.textContent = `Total: R$ ${total.toFixed(2)}`;
+        }
+
+        // Controlar quantidade
+        function aumentarQuantidade(index) {
+            const item = carrinho[index];
+            const produto = estoque[item.id];
+            
+            if (item.quantidade < produto.estoque) {
+                item.quantidade++;
+                atualizarCarrinho();
+                renderizarProdutos();
+            } else {
+                alert('Quantidade máxima atingida!');
+            }
+        }
+
+        function diminuirQuantidade(index) {
+            carrinho[index].quantidade--;
+            if (carrinho[index].quantidade === 0) {
+                carrinho.splice(index, 1);
+            }
+            atualizarCarrinho();
+            renderizarProdutos();
+        }
+
+        function removerDoCarrinho(index) {
+            carrinho.splice(index, 1);
+            atualizarCarrinho();
+            renderizarProdutos();
+        }
+
+        function clearCart() {
+            if (carrinho.length > 0) {
+                if (confirm('Deseja limpar o carrinho?')) {
+                    carrinho = [];
+                    atualizarCarrinho();
+                    renderizarProdutos();
+                }
+            }
+        }
+
+        // Finalizar venda
+        function finalizeSale() {
+            if (carrinho.length === 0) {
+                alert('Carrinho vazio! Adicione produtos para finalizar a venda.');
+                return;
+            }
+
+            // Atualizar estoque
+            carrinho.forEach(item => {
+                estoque[item.id].estoque -= item.quantidade;
+            });
+
+            // Mostrar mensagem de sucesso
+            const total = carrinho.reduce((sum, item) => sum + (item.preco * item.quantidade), 0);
+            document.getElementById('saleMessage').innerHTML = `
+                Venda finalizada com sucesso!<br>
+                Total: R$ ${total.toFixed(2)}<br>
+                Itens vendidos: ${carrinho.length}
+            `;
+
+            // Limpar carrinho
+            carrinho = [];
+            
+            // Atualizar interface
+            atualizarCarrinho();
+            renderizarProdutos();
+            
+            // Mostrar modal
+            document.getElementById('saleModal').style.display = 'flex';
+        }
+
+        // Modal de adicionar produto
+        function openAddProductModal() {
+            document.getElementById('addProductModal').style.display = 'flex';
+        }
+
+        function closeAddProductModal() {
+            document.getElementById('addProductModal').style.display = 'none';
+            document.getElementById('productName').value = '';
+            document.getElementById('productPrice').value = '';
+            document.getElementById('productStock').value = '';
+        }
+
+        function closeSaleModal() {
+            document.getElementById('saleModal').style.display = 'none';
+        }
+
+        // Adicionar novo produto
+        function addNewProduct() {
+            const tipo = document.getElementById('productType').value;
+            const nome = document.getElementById('productName').value;
+            const preco = parseFloat(document.getElementById('productPrice').value);
+            const estoqueVal = parseInt(document.getElementById('productStock').value);
+
+            if (!nome || isNaN(preco) || isNaN(estoqueVal)) {
+                alert('Preencha todos os campos corretamente!');
+                return;
+            }
+
+            // Definir ícone baseado no tipo
+            let icone = '📦';
+            if (tipo === 'bebida') icone = '🍺';
+            if (tipo === 'dose') icone = '🥃';
+            if (tipo === 'carteira_cigarro' || tipo === 'unidade_cigarro') icone = '🚬';
+            if (tipo === 'armarinho') icone = '🍬';
+
+            const novoId = String(proximoId).padStart(3, '0');
+            
+            estoque[novoId] = {
+                id: novoId,
+                nome: nome,
+                tipo: tipo,
+                preco: preco,
+                estoque: estoqueVal,
+                icone: icone
+            };
+
+            proximoId++;
+            closeAddProductModal();
+            renderizarProdutos();
+            alert('Produto adicionado com sucesso!');
+        }
+
+        // Atualizar formulário baseado no tipo
+        function updateProductForm() {
+            const tipo = document.getElementById('productType').value;
+            const nomeInput = document.getElementById('productName');
+            
+            switch(tipo) {
+                case 'bebida':
+                    nomeInput.placeholder = 'Ex: Cerveja Skol 350ml';
+                    break;
+                case 'dose':
+                    nomeInput.placeholder = 'Ex: Dose de Whisky';
+                    break;
+                case 'carteira_cigarro':
+                    nomeInput.placeholder = 'Ex: Malboro Vermelho';
+                    break;
+                case 'unidade_cigarro':
+                    nomeInput.placeholder = 'Ex: Cigarro Avulso';
+                    break;
+                case 'armarinho':
+                    nomeInput.placeholder = 'Ex: Bala Halls 30g';
+                    break;
+            }
+        }
+
+        // Fechar modal ao clicar fora
+        window.onclick = function(event) {
+            if (event.target.id === 'addProductModal') {
+                closeAddProductModal();
+            }
+            if (event.target.id === 'saleModal') {
+                closeSaleModal();
+            }
+        };
+    </script>
+</body>
+</html>
